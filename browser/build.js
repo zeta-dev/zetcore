@@ -2,7 +2,6 @@
 
 var fs = require('fs');
 var browserify = require('browserify');
-var browserPack = require('browser-pack');
 var exec = require('child_process').exec;
 var sys = require('sys');
 var puts = function(error, stdout, stderr) {
@@ -11,20 +10,10 @@ var puts = function(error, stdout, stderr) {
   //sys.puts(stderr);
 };
 
-var pack = function(params) {
-  var file = require.resolve('soop');
-  var dir = file.substr(0, file.length - String('soop.js').length);
-  var preludePath = dir + 'example/custom_prelude.js';
-  params.raw = true;
-  params.sourceMapPrefix = '//#';
-  params.prelude = fs.readFileSync(preludePath, 'utf8');
-  params.preludePath = preludePath;
-  return browserPack(params);
-};
-
 var modules = [
   'lib/Address',
   'lib/Armory',
+  'lib/AuthMessage',
   'lib/Base58',
   'lib/HierarchicalKey',
   'lib/BIP39',
@@ -32,12 +21,13 @@ var modules = [
   'lib/Block',
   'lib/Bloom',
   'lib/Connection',
-  'lib/Curve',
   'lib/Deserialize',
   'lib/ECIES',
   'lib/Electrum',
   'lib/Message',
+  'lib/NetworkMonitor',
   'lib/Opcode',
+  'lib/PayPro',
   'lib/Peer',
   'lib/PeerManager',
   'lib/PrivateKey',
@@ -49,7 +39,6 @@ var modules = [
   'lib/Script',
   'lib/ScriptInterpreter',
   'lib/SecureRandom',
-  'lib/Sign',
   'lib/sjcl',
   'lib/Transaction',
   'lib/TransactionBuilder',
@@ -74,12 +63,6 @@ var createBitcore = function(opts) {
 
   opts.dir = opts.dir || '';
 
-  // concat browser vendor files
-  var cwd = process.cwd();
-  process.chdir(opts.dir + 'browser');
-  exec('sh concat.sh', puts);
-  process.chdir(cwd);
-
   if (!opts.includeall && !opts.includemain && (!opts.submodules || opts.submodules.length === 0)) {
     if (!opts.stdout) console.log('Must use either -s or -a or -m option. For more info use the --help option');
     process.exit(1);
@@ -87,12 +70,18 @@ var createBitcore = function(opts) {
 
   var submodules = opts.submodules;
 
+  //modules included in "all" but not included in "main" bundle
   if (opts.includemain) {
     submodules = JSON.parse(JSON.stringify(modules));
     submodules.splice(submodules.indexOf('lib/BIP39'), 1);
     submodules.splice(submodules.indexOf('lib/BIP39WordlistEn'), 1);
+    submodules.splice(submodules.indexOf('lib/PayPro'), 1);
+    submodules.splice(submodules.indexOf('lib/Connection'), 1);
+    submodules.splice(submodules.indexOf('lib/Peer'), 1);
+    submodules.splice(submodules.indexOf('lib/PeerManager'), 1);
+    submodules.splice(submodules.indexOf('lib/NetworkMonitor'), 1);
     var assert = require('assert');
-    assert(submodules.length == modules.length - 2);
+    assert(submodules.length == modules.length - 7);
   }
 
   if (opts.submodules) {
@@ -103,7 +92,6 @@ var createBitcore = function(opts) {
   }
 
   var bopts = {
-    pack: pack,
     debug: true,
     standalone: 'bitcore',
     insertGlobals: true
@@ -115,6 +103,9 @@ var createBitcore = function(opts) {
   });
   b.require(opts.dir + 'bufferput', {
     expose: 'bufferput'
+  });
+  b.require(opts.dir + 'events', {
+    expose: 'events'
   });
   b.require(opts.dir + 'buffers', {
     expose: 'buffers'
@@ -143,7 +134,6 @@ var createBitcore = function(opts) {
 
 var createTestData = function() {
   var bopts = {
-    pack: pack,
     debug: true,
     standalone: 'testdata',
     insertGlobals: true
@@ -151,6 +141,9 @@ var createTestData = function() {
   var tb = browserify(bopts);
   tb.require('./test/testdata', {
     expose: 'testdata'
+  });
+  tb.require('sinon', {
+    expose: 'sinon'
   });
   tb.transform('brfs');
 
@@ -178,7 +171,10 @@ if (require.main === module) {
     testBundle.pipe(fs.createWriteStream('browser/testdata.js'));
   }
   var bitcoreBundle = createBitcore(program);
-  bitcoreBundle.pipe(program.stdout ? process.stdout : fs.createWriteStream('browser/bundle.js'));
+  var pjson = require('../package.json');
+  bitcoreBundle.pipe(
+      program.stdout ? process.stdout :
+      fs.createWriteStream('browser/bundle.js'));
 }
 
 module.exports.createBitcore = createBitcore;

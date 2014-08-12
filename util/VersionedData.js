@@ -1,21 +1,21 @@
-var imports = require('soop').imports();
-var base58 = imports.base58 || require('../lib/Base58').base58Check;
-var parent = imports.parent || require('./EncodedData');
+var base58 = require('../lib/Base58').base58Check;
+var util = require('util');
+var EncodedData = require('./EncodedData');
 
 
 function VersionedData(version, payload) {
+  VersionedData.super_.call(this, version, payload);
   if (typeof version != 'number') {
-    VersionedData.super(this, arguments);
     return;
   };
   this.data = new Buffer(payload.length + 1);
-  this.__proto__ = this.encodings['binary'];
+  this.encoding('binary');
   this.version(version);
   this.payload(payload);
 };
 
-VersionedData.parent = parent;
-parent.applyEncodingsTo(VersionedData);
+util.inherits(VersionedData, EncodedData);
+EncodedData.applyEncodingsTo(VersionedData);
 
 // get or set the version data (the first byte of the address)
 VersionedData.prototype.version = function(num) {
@@ -39,4 +39,4 @@ VersionedData.prototype.payload = function(data) {
   return this.as('binary').slice(1);
 };
 
-module.exports = require('soop')(VersionedData);
+module.exports = VersionedData;
