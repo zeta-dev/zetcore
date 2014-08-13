@@ -7,30 +7,31 @@ var hex = function(hex) {
 exports.livenet = {
   name: 'livenet',
   magic: hex('f9beb4d9'),
-  addressVersion: 0x00,
-  privKeyVersion: 128,
+  addressVersion: 0x50,
+  privKeyVersion: 208,
   P2SHVersion: 5,
   hkeyPublicVersion: 0x0488b21e,
   hkeyPrivateVersion: 0x0488ade4,
   genesisBlock: {
-    hash: hex('6FE28C0AB6F1B372C1A6A246AE63F74F931E8365E15A089C68D6190000000000'),
-    merkle_root: hex('3BA3EDFD7A7B12B27AC72C3E67768F617FC81BC3888A51323A9FB8AA4B1E5E4A'),
+    hash: hex('000006CAB7AA2BE2DA91015902AA4458DD5FBB8778D175C36D429DC986F2BFF4'),
+    merkle_root: hex('D0227B8C3E3D07BCE9656B3D9E474F050D23458AAEAD93357DCFDAC9AB9B79F9'),
     height: 0,
-    nonce: 2083236893,
+    nonce: 2089928209,
     version: 1,
     prev_hash: buffertools.fill(new Buffer(32), 0),
-    timestamp: 1231006505,
-    bits: 486604799,
+    timestamp: 1375548986,
+    bits: 504365055,
   },
   dnsSeeds: [
-    'seed.bitcoin.sipa.be',
-    'dnsseed.bluematt.me',
-    'dnsseed.bitcoin.dashjr.org',
-    'seed.bitcoinstats.com',
-    'seed.bitnodes.io',
-    'bitseed.xf2.org'
+    "zetacoin.no-ip.org",
+    "zetacoin.strangled.net",
+    "zetacoin.ignorelist.com",
+    "seed1.zeta-coin.org",
+    "seed2.zeta-coin.org",
+    "seed3.zeta-coin.org",
+    "seed4.zeta-coin.org"
   ],
-  defaultClientPort: 8333
+  defaultClientPort: 17333
 };
 
 exports.mainnet = exports.livenet;
