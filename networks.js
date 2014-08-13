@@ -6,10 +6,10 @@ var hex = function(hex) {
 
 exports.livenet = {
   name: 'livenet',
-  magic: hex('f9beb4d9'),
+  magic: hex('fab503df'),
   addressVersion: 0x50,
-  privKeyVersion: 208,
-  P2SHVersion: 5,
+  privKeyVersion: 224,
+  P2SHVersion: 9,
   hkeyPublicVersion: 0x0488b21e,
   hkeyPrivateVersion: 0x0488ade4,
   genesisBlock: {
@@ -38,25 +38,25 @@ exports.mainnet = exports.livenet;
 
 exports.testnet = {
   name: 'testnet',
-  magic: hex('0b110907'),
-  addressVersion: 0x6f,
+  magic: hex('05fea901'),
+  addressVersion: 0x58,
   privKeyVersion: 239,
-  P2SHVersion: 196,
+  P2SHVersion: 188,
   hkeyPublicVersion: 0x043587cf,
   hkeyPrivateVersion: 0x04358394,
   genesisBlock: {
-    hash: hex('43497FD7F826957108F4A30FD9CEC3AEBA79972084E90EAD01EA330900000000'),
-    merkle_root: hex('3BA3EDFD7A7B12B27AC72C3E67768F617FC81BC3888A51323A9FB8AA4B1E5E4A'),
+    hash: hex('000007717E2E2DF52A9FF29B0771901C9C12F5CBB4914CDF0C8047B459BB21D8'),
+    merkle_root: hex('D0227B8C3E3D07BCE9656B3D9E474F050D23458AAEAD93357DCFDAC9AB9B79F9'),
     height: 0,
-    nonce: 414098458,
+    nonce: 414708675,
     version: 1,
     prev_hash: buffertools.fill(new Buffer(32), 0),
-    timestamp: 1296688602,
-    bits: 486604799,
+    timestamp: 1374901773,
+    bits: 504365055,
   },
   dnsSeeds: [
     'testnet-seed.bitcoin.petertodd.org',
     'testnet-seed.bluematt.me'
   ],
-  defaultClientPort: 18333
+  defaultClientPort: 27333
 };
