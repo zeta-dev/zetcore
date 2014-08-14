@@ -23,13 +23,22 @@ exports.livenet = {
     bits: 504365055,
   },
   dnsSeeds: [
+    "zetacoin.zapto.org",
     "zetacoin.no-ip.org",
     "zetacoin.strangled.net",
     "zetacoin.ignorelist.com",
     "seed1.zeta-coin.org",
     "seed2.zeta-coin.org",
     "seed3.zeta-coin.org",
-    "seed4.zeta-coin.org"
+    "seed4.zeta-coin.org",
+    "seed5.zeta-coin.org",
+    "seed6.zeta-coin.org",
+    "seed7.zeta-coin.org",
+    "seed8.zeta-coin.org",
+    "albs1.zetacoinseed.com",
+    "albs2.zetacoinseed.com",
+    "albs3.zetacoinseed.com",
+    "albs4.zetacoinseed.com"
   ],
   defaultClientPort: 17333
 };
