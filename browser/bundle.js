@@ -2,7 +2,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 module.exports=require('tmvhGl');
 },{}],"tmvhGl":[function(require,module,exports){
 (function (Buffer){
-/* 
+/*
 One way to require files is this simple way:
 module.exports.Address = require('./Address');
 
@@ -138,7 +138,7 @@ exports.MSG = MSG;
 //        //...
 //     }
 //
-//     // Also an address can be created from 
+//     // Also an address can be created from
 //     // public keys
 //     var address = Address.fromPubKey(myPubkey);
 //
@@ -146,9 +146,9 @@ exports.MSG = MSG;
 //     var address  = Address.fromScriptPubKey(scriptPubKey);
 //
 //     // Multisig address p2sh handling
-//     var myPukeys = [pubkey0, pubkey1, pubkey2]; 
+//     var myPukeys = [pubkey0, pubkey1, pubkey2];
 //     var p2shAddress = Address.fromPubKeys(2, myPubkeys);
-//     if (p2shAddress.isScript()) { //true 
+//     if (p2shAddress.isScript()) { //true
 //     }
 //
 //
@@ -323,7 +323,7 @@ Address.fromScriptSig = function(scriptSig, network) {
   var payload = scriptSig.chunks;
   if (scriptSig.chunks.length === 2)
     return Address.fromPubkeyHashScriptSig(scriptSig, network);
-  // TODO: support other scriptSig types 
+  // TODO: support other scriptSig types
   return null;
 };
 
@@ -1094,9 +1094,12 @@ Block.prototype.checkBlock = function checkBlock(txs) {
 };
 
 Block.getBlockValue = function getBlockValue(height) {
-  var subsidy = 50 * util.COIN;
-  subsidy = subsidy / (Math.pow(2, Math.floor(height / 210000)));
-  subsidy = Math.floor(subsidy);
+  var subsidy = 1000 * util.COIN;
+  var minSubsidy = 1 * util.COIN;
+  if (height > 0) {
+    subsidy = subsidy / (Math.pow(2, Math.floor(height / 80640)));
+    subsidy = Math.max(minSubsidy, Math.floor(subsidy));
+  }
   subsidy = new Bignum(subsidy);
   return subsidy;
 };
@@ -2395,13 +2398,13 @@ NetworkMonitor.prototype.init = function() {
   var handleTx = function(info) {
     var tx = info.message.tx;
     self.emit('tx', tx);
-    
+
     var from = tx.getSendingAddresses(self.networkName);
     for (var i = 0; i < from.length; i++) {
       var addr = from[i];
       self.emit('out:'+addr, tx);
     }
-    var to = tx.getReceivingAddresses(self.networkName); 
+    var to = tx.getReceivingAddresses(self.networkName);
     for (var i = 0; i < to.length; i++) {
       var addr = to[i];
       self.emit('in:'+addr, tx);
@@ -3609,7 +3612,7 @@ Script.prototype.getSignatures = function() {
   if (this.isMultiSigScriptSig()) {
     for(var i = 1; i<l; i++) {
       ret.push(this.chunks[i]);
-    } 
+    }
   }
   // p2sh
   else if (this.isP2shScriptSig()) {
@@ -5934,19 +5937,19 @@ module.exports=require('D1Ge6m');
 //     broadcast(tx.serialize());
 //
 //     //Serialize it and pass it around...
-//     var string = JSON.stringify(builder.toObj()); 
+//     var string = JSON.stringify(builder.toObj());
 //     // then...
-//     var builder = TransactionBuilder.fromObj(JSON.parse(str); 
+//     var builder = TransactionBuilder.fromObj(JSON.parse(str);
 //     builder.sign(keys);
 //     // Also
-//     var builder2 = TransactionBuilder.fromObj(JSON.parse(str2); 
+//     var builder2 = TransactionBuilder.fromObj(JSON.parse(str2);
 //     builder2.merge(builder); // Will merge signatures for p2sh mulsig txs.
-//      
+//
 //
 // ```
 //
-//  
-//  
+//
+//
 
 
 'use strict';
@@ -5974,26 +5977,26 @@ var TOOBJ_VERSION = 1;
 // Creates a TransactionBuilder instance
 // `opts`
 //  ```
-//      { 
+//      {
 //        remainderOut: null,
 //        fee: 0.001,
 //        lockTime: null,
 //        spendUnconfirmed: false,
 //        signhash: SIGHASH_ALL
 //      }
-//  ```    
-//  Amounts are in BTC. instead of fee and amount; feeSat and amountSat can be given, 
+//  ```
+//  Amounts are in BTC. instead of fee and amount; feeSat and amountSat can be given,
 //  repectively, to provide amounts in satoshis.
-//  
+//
 //  If no remainderOut is given, and there are remainder coins, the
 //  first IN out will be used to return the coins. remainderOut has the form:
 //  ```
 //      remainderOut = { address: 1xxxxx}
-//  ```    
+//  ```
 //  or
 //  ```
 //      remainderOut = { pubkeys: ['hex1','hex2',...} for multisig
-//  ```    
+//  ```
 
 function TransactionBuilder(opts) {
   opts = opts || {};
@@ -6066,7 +6069,7 @@ TransactionBuilder.infoForP2sh = function(opts, networkName) {
 
 // setUnspent
 // ----------
-//  Sets the `unspent` available for the transaction. Some (or all) 
+//  Sets the `unspent` available for the transaction. Some (or all)
 //  of them to fullfil the transaction's outputs and fee.
 //  The expected format is:
 //  ```
@@ -6075,12 +6078,12 @@ TransactionBuilder.infoForP2sh = function(opts, networkName) {
 //         txid: "2ac165fa7a3a2b535d106a0041c7568d03b531e58aeccdd3199d7289ab12cfc1",
 //         scriptPubKey: "76a9146ce4e1163eb18939b1440c42844d5f0261c0338288ac",
 //         vout: 1,
-//         amount: 0.01,                
+//         amount: 0.01,
 //        confirmations: 3
 //         }, ...
 //      ]
-//  ```    
-//   This is compatible con insight's utxo API. 
+//  ```
+//   This is compatible con insight's utxo API.
 //   That amount is in BTCs (as returned in insight and bitcoind).
 //   amountSat (instead of amount) can be given to provide amount in satochis.
 TransactionBuilder.prototype.setUnspent = function(unspent) {
@@ -6278,10 +6281,10 @@ TransactionBuilder.prototype._setFeeAndRemainder = function(txobj) {
 // Sets the outputs for the transaction. Format is:
 // ```
 //      an array of [{
-//        address: xx, 
+//        address: xx,
 //        amount:0.001
 //       },...]
-// ```      
+// ```
 //
 // Note that only some of this outputs will be selected
 // to create the transaction. The selected ones can be checked
@@ -6449,7 +6452,7 @@ var _dumpChunks = function (scriptSig, label) {
   console.log('## DUMP: ' + label + ' ##');
   for(var i=0; i<scriptSig.chunks.length; i++) {
     console.log('\tCHUNK ', i, Buffer.isBuffer(scriptSig.chunks[i])
-                ?scriptSig.chunks[i].toString('hex'):scriptSig.chunks[i] ); 
+                ?scriptSig.chunks[i].toString('hex'):scriptSig.chunks[i] );
   }
 };
 */
@@ -6644,11 +6647,11 @@ fnToSign[Script.TX_SCRIPTHASH] = TransactionBuilder.prototype._signScriptHash;
 
 // sign
 // ----
-// Signs a transaction. 
-// `keys`: an array of strings representing private keys to sign the 
+// Signs a transaction.
+// `keys`: an array of strings representing private keys to sign the
 // transaction in WIF private key format OR bitcore's `WalletKey` objects
 //
-// If multiple keys are given, each will be tested against the transaction's 
+// If multiple keys are given, each will be tested against the transaction's
 // scriptPubKeys. Only the valid private keys will be used to sign.
 // This method is fully compatible with *multisig* transactions.
 //
@@ -6747,7 +6750,7 @@ TransactionBuilder.prototype._setScriptSig = function(inScriptSig) {
 // fromObj
 // -------
 // Returns a TransactionBuilder instance given
-// a plain Javascript object created previously 
+// a plain Javascript object created previously
 // with `.toObj`. See `.toObj`.
 
 TransactionBuilder.fromObj = function(data) {
@@ -6924,7 +6927,7 @@ TransactionBuilder.prototype.clone = function() {
 // This function supports multisig p2sh inputs.
 
 TransactionBuilder.prototype.merge = function(inB) {
-  // 
+  //
   var b = inB.clone();
 
   this._checkMergeability(b);
@@ -13083,7 +13086,7 @@ exports = module.exports = function (bufOrEm, eventName) {
     if (Buffer.isBuffer(bufOrEm)) {
         return exports.parse(bufOrEm);
     }
-    
+
     var s = exports.stream();
     if (bufOrEm && bufOrEm.pipe) {
         bufOrEm.pipe(s);
@@ -13092,7 +13095,7 @@ exports = module.exports = function (bufOrEm, eventName) {
         bufOrEm.on(eventName || 'data', function (buf) {
             s.write(buf);
         });
-        
+
         bufOrEm.on('end', function () {
             s.end();
         });
@@ -13102,7 +13105,7 @@ exports = module.exports = function (bufOrEm, eventName) {
 
 exports.stream = function (input) {
     if (input) return exports.apply(null, arguments);
-    
+
     var pending = null;
     function getBytes (bytes, cb, skip) {
         pending = {
@@ -13115,7 +13118,7 @@ exports.stream = function (input) {
         };
         dispatch();
     }
-    
+
     var offset = null;
     function dispatch () {
         if (!pending) {
@@ -13127,7 +13130,7 @@ exports.stream = function (input) {
         }
         else {
             var bytes = offset + pending.bytes;
-            
+
             if (buffers.length >= bytes) {
                 var buf;
                 if (offset == null) {
@@ -13142,7 +13145,7 @@ exports.stream = function (input) {
                     }
                     offset = bytes;
                 }
-                
+
                 if (pending.skip) {
                     pending.cb();
                 }
@@ -13152,10 +13155,10 @@ exports.stream = function (input) {
             }
         }
     }
-    
+
     function builder (saw) {
         function next () { if (!done) saw.next() }
-        
+
         var self = words(function (bytes, cb) {
             return function (name) {
                 getBytes(bytes, function (buf) {
@@ -13164,16 +13167,16 @@ exports.stream = function (input) {
                 });
             };
         });
-        
+
         self.tap = function (cb) {
             saw.nest(cb, vars.store);
         };
-        
+
         self.into = function (key, cb) {
             if (!vars.get(key)) vars.set(key, {});
             var parent = vars;
             vars = Vars(parent.get(key));
-            
+
             saw.nest(function () {
                 cb.apply(this, arguments);
                 this.tap(function () {
@@ -13181,15 +13184,15 @@ exports.stream = function (input) {
                 });
             }, vars.store);
         };
-        
+
         self.flush = function () {
             vars.store = {};
             next();
         };
-        
+
         self.loop = function (cb) {
             var end = false;
-            
+
             saw.nest(false, function loop () {
                 this.vars = vars.store;
                 cb.call(this, function () {
@@ -13202,28 +13205,28 @@ exports.stream = function (input) {
                 }.bind(this));
             }, vars.store);
         };
-        
+
         self.buffer = function (name, bytes) {
             if (typeof bytes === 'string') {
                 bytes = vars.get(bytes);
             }
-            
+
             getBytes(bytes, function (buf) {
                 vars.set(name, buf);
                 next();
             });
         };
-        
+
         self.skip = function (bytes) {
             if (typeof bytes === 'string') {
                 bytes = vars.get(bytes);
             }
-            
+
             getBytes(bytes, function () {
                 next();
             });
         };
-        
+
         self.scan = function find (name, search) {
             if (typeof search === 'string') {
                 search = new Buffer(search);
@@ -13231,7 +13234,7 @@ exports.stream = function (input) {
             else if (!Buffer.isBuffer(search)) {
                 throw new Error('search must be a Buffer or a string');
             }
-            
+
             var taken = 0;
             pending = function () {
                 var pos = buffers.indexOf(search, offset + taken);
@@ -13261,7 +13264,7 @@ exports.stream = function (input) {
             };
             dispatch();
         };
-        
+
         self.peek = function (cb) {
             offset = 0;
             saw.nest(function () {
@@ -13271,32 +13274,32 @@ exports.stream = function (input) {
                 });
             });
         };
-        
+
         return self;
     };
-    
+
     var stream = Chainsaw.light(builder);
     stream.writable = true;
-    
+
     var buffers = Buffers();
-    
+
     stream.write = function (buf) {
         buffers.push(buf);
         dispatch();
     };
-    
+
     var vars = Vars();
-    
+
     var done = false, caughtEnd = false;
     stream.end = function () {
         caughtEnd = true;
     };
-    
+
     stream.pipe = Stream.prototype.pipe;
     Object.getOwnPropertyNames(EventEmitter.prototype).forEach(function (name) {
         stream[name] = EventEmitter.prototype[name];
     });
-    
+
     return stream;
 };
 
@@ -13314,16 +13317,16 @@ exports.parse = function parse (buffer) {
             return self;
         };
     });
-    
+
     var offset = 0;
     var vars = Vars();
     self.vars = vars.store;
-    
+
     self.tap = function (cb) {
         cb.call(self, vars.store);
         return self;
     };
-    
+
     self.into = function (key, cb) {
         if (!vars.get(key)) {
             vars.set(key, {});
@@ -13334,7 +13337,7 @@ exports.parse = function parse (buffer) {
         vars = parent;
         return self;
     };
-    
+
     self.loop = function (cb) {
         var end = false;
         var ender = function () { end = true };
@@ -13343,7 +13346,7 @@ exports.parse = function parse (buffer) {
         }
         return self;
     };
-    
+
     self.buffer = function (name, size) {
         if (typeof size === 'string') {
             size = vars.get(size);
@@ -13351,19 +13354,19 @@ exports.parse = function parse (buffer) {
         var buf = buffer.slice(offset, Math.min(buffer.length, offset + size));
         offset += size;
         vars.set(name, buf);
-        
+
         return self;
     };
-    
+
     self.skip = function (bytes) {
         if (typeof bytes === 'string') {
             bytes = vars.get(bytes);
         }
         offset += bytes;
-        
+
         return self;
     };
-    
+
     self.scan = function (name, search) {
         if (typeof search === 'string') {
             search = new Buffer(search);
@@ -13372,7 +13375,7 @@ exports.parse = function parse (buffer) {
             throw new Error('search must be a Buffer or a string');
         }
         vars.set(name, null);
-        
+
         // simple but slow string search
         for (var i = 0; i + offset <= buffer.length - search.length + 1; i++) {
             for (
@@ -13382,28 +13385,28 @@ exports.parse = function parse (buffer) {
             );
             if (j === search.length) break;
         }
-        
+
         vars.set(name, buffer.slice(offset, offset + i));
         offset += i + search.length;
         return self;
     };
-    
+
     self.peek = function (cb) {
         var was = offset;
         cb.call(self, vars.store);
         offset = was;
         return self;
     };
-    
+
     self.flush = function () {
         vars.store = {};
         return self;
     };
-    
+
     self.eof = function () {
         return offset >= buffer.length;
     };
-    
+
     return self;
 };
 
@@ -13445,29 +13448,29 @@ function decodeLEs (bytes) {
 
 function words (decode) {
     var self = {};
-    
+
     [ 1, 2, 4, 8 ].forEach(function (bytes) {
         var bits = bytes * 8;
-        
+
         self['word' + bits + 'le']
         = self['word' + bits + 'lu']
         = decode(bytes, decodeLEu);
-        
+
         self['word' + bits + 'ls']
         = decode(bytes, decodeLEs);
-        
+
         self['word' + bits + 'be']
         = self['word' + bits + 'bu']
         = decode(bytes, decodeBEu);
-        
+
         self['word' + bits + 'bs']
         = decode(bytes, decodeBEs);
     });
-    
+
     // word8be(n) == word8le(n) for all n
     self.word8 = self.word8u = self.word8be;
     self.word8s = self.word8bs;
-    
+
     return self;
 }
 
@@ -13489,7 +13492,7 @@ module.exports = function (store) {
             return node[key] = value;
         }
     }
-    
+
     var vars = {
         get : function (name) {
             return getset(name);
@@ -13708,19 +13711,19 @@ Traverse.prototype.deepEqual = function (obj) {
             'deepEqual requires exactly one object to compare against'
         );
     }
-    
+
     var equal = true;
     var node = obj;
-    
+
     this.forEach(function (y) {
         var notEqual = (function () {
             equal = false;
             //this.stop();
             return undefined;
         }).bind(this);
-        
+
         //if (node === undefined || node === null) return notEqual();
-        
+
         if (!this.isRoot) {
         /*
             if (!Object.hasOwnProperty.call(node, this.key)) {
@@ -13730,17 +13733,17 @@ Traverse.prototype.deepEqual = function (obj) {
             if (typeof node !== 'object') return notEqual();
             node = node[this.key];
         }
-        
+
         var x = node;
-        
+
         this.post(function () {
             node = x;
         });
-        
+
         var toS = function (o) {
             return Object.prototype.toString.call(o);
         };
-        
+
         if (this.circular) {
             if (Traverse(obj).get(this.circular.path) !== x) notEqual();
         }
@@ -13789,14 +13792,14 @@ Traverse.prototype.deepEqual = function (obj) {
             }
         }
     });
-    
+
     return equal;
 };
 
 Traverse.prototype.paths = function () {
     var acc = [];
     this.forEach(function (x) {
-        acc.push(this.path); 
+        acc.push(this.path);
     });
     return acc;
 };
@@ -13811,24 +13814,24 @@ Traverse.prototype.nodes = function () {
 
 Traverse.prototype.clone = function () {
     var parents = [], nodes = [];
-    
+
     return (function clone (src) {
         for (var i = 0; i < parents.length; i++) {
             if (parents[i] === src) {
                 return nodes[i];
             }
         }
-        
+
         if (typeof src === 'object' && src !== null) {
             var dst = copy(src);
-            
+
             parents.push(src);
             nodes.push(dst);
-            
+
             Object.keys(src).forEach(function (key) {
                 dst[key] = clone(src[key]);
             });
-            
+
             parents.pop();
             nodes.pop();
             return dst;
@@ -13843,11 +13846,11 @@ function walk (root, cb, immutable) {
     var path = [];
     var parents = [];
     var alive = true;
-    
+
     return (function walker (node_) {
         var node = immutable ? copy(node_) : node_;
         var modifiers = {};
-        
+
         var state = {
             node : node,
             node_ : node_,
@@ -13880,12 +13883,12 @@ function walk (root, cb, immutable) {
             post : function (f) { modifiers.post = f },
             stop : function () { alive = false }
         };
-        
+
         if (!alive) return state;
-        
+
         if (typeof node === 'object' && node !== null) {
             state.isLeaf = Object.keys(node).length == 0;
-            
+
             for (var i = 0; i < parents.length; i++) {
                 if (parents[i].node_ === node_) {
                     state.circular = parents[i];
@@ -13896,42 +13899,42 @@ function walk (root, cb, immutable) {
         else {
             state.isLeaf = true;
         }
-        
+
         state.notLeaf = !state.isLeaf;
         state.notRoot = !state.isRoot;
-        
+
         // use return values to update if defined
         var ret = cb.call(state, state.node);
         if (ret !== undefined && state.update) state.update(ret);
         if (modifiers.before) modifiers.before.call(state, state.node);
-        
+
         if (typeof state.node == 'object'
         && state.node !== null && !state.circular) {
             parents.push(state);
-            
+
             var keys = Object.keys(state.node);
             keys.forEach(function (key, i) {
                 path.push(key);
-                
+
                 if (modifiers.pre) modifiers.pre.call(state, state.node[key], key);
-                
+
                 var child = walker(state.node[key]);
                 if (immutable && Object.hasOwnProperty.call(state.node, key)) {
                     state.node[key] = child.node;
                 }
-                
+
                 child.isLast = i == keys.length - 1;
                 child.isFirst = i == 0;
-                
+
                 if (modifiers.post) modifiers.post.call(state, child);
-                
+
                 path.pop();
             });
             parents.pop();
         }
-        
+
         if (modifiers.after) modifiers.after.call(state, state.node);
-        
+
         return state;
     })(root).node;
 }
@@ -13947,7 +13950,7 @@ Object.keys(Traverse.prototype).forEach(function (key) {
 function copy (src) {
     if (typeof src === 'object' && src !== null) {
         var dst;
-        
+
         if (Array.isArray(src)) {
             dst = [];
         }
@@ -13966,7 +13969,7 @@ function copy (src) {
         else {
             dst = Object.create(Object.getPrototypeOf(src));
         }
-        
+
         Object.keys(src).forEach(function (key) {
             dst[key] = src[key];
         });
@@ -18539,7 +18542,7 @@ function hash(alg, key) {
   return {
     update: function (data) {
       if(!Buffer.isBuffer(data)) data = new Buffer(data)
-        
+
       bufs.push(data)
       length += data.length
       return this
@@ -19300,7 +19303,7 @@ http.request = function (params, cb) {
     if (!params.host && params.hostname) {
         params.host = params.hostname;
     }
-    
+
     if (!params.scheme) params.scheme = window.location.protocol.split(':')[0];
     if (!params.host) {
         params.host = window.location.hostname || window.location.host;
@@ -19312,7 +19315,7 @@ http.request = function (params, cb) {
         params.host = params.host.split(':')[0];
     }
     if (!params.port) params.port = params.scheme == 'https' ? 443 : 80;
-    
+
     var req = new Request(new xhrHttp, params);
     if (cb) req.on('response', cb);
     return req;
@@ -19433,20 +19436,20 @@ var Request = module.exports = function (xhr, params) {
     self.writable = true;
     self.xhr = xhr;
     self.body = [];
-    
+
     self.uri = (params.scheme || 'http') + '://'
         + params.host
         + (params.port ? ':' + params.port : '')
         + (params.path || '/')
     ;
-    
+
     if (typeof params.withCredentials === 'undefined') {
         params.withCredentials = true;
     }
 
     try { xhr.withCredentials = params.withCredentials }
     catch (e) {}
-    
+
     xhr.open(
         params.method || 'GET',
         self.uri,
@@ -19454,7 +19457,7 @@ var Request = module.exports = function (xhr, params) {
     );
 
     self._headers = {};
-    
+
     if (params.headers) {
         var keys = objectKeys(params.headers);
         for (var i = 0; i < keys.length; i++) {
@@ -19464,7 +19467,7 @@ var Request = module.exports = function (xhr, params) {
             self.setHeader(key, value);
         }
     }
-    
+
     if (params.auth) {
         //basic auth
         this.setHeader('Authorization', 'Basic ' + Base64.btoa(params.auth));
@@ -19474,11 +19477,11 @@ var Request = module.exports = function (xhr, params) {
     res.on('close', function () {
         self.emit('close');
     });
-    
+
     res.on('ready', function () {
         self.emit('response', res);
     });
-    
+
     xhr.onreadystatechange = function () {
         // Fix for IE9 bug
         // SCRIPT575: Could not complete the operation due to error c00c023f
@@ -19547,7 +19550,7 @@ Request.prototype.end = function (s) {
         }
         var body = new(this.body[0].constructor)(len);
         var k = 0;
-        
+
         for (var i = 0; i < this.body.length; i++) {
             var b = this.body[i];
             for (var j = 0; j < b.length; j++) {
@@ -19635,13 +19638,13 @@ function parseHeaders (res) {
     for (var i = 0; i < lines.length; i++) {
         var line = lines[i];
         if (line === '') continue;
-        
+
         var m = line.match(/^([^:]+):\s*(.*)/);
         if (m) {
             var key = m[1].toLowerCase(), value = m[2];
-            
+
             if (headers[key] !== undefined) {
-            
+
                 if (isArray(headers[key])) {
                     headers[key].push(value);
                 }
@@ -19680,7 +19683,7 @@ Response.prototype.handle = function (res) {
         catch (err) {
             capable.status2 = false;
         }
-        
+
         if (capable.status2) {
             this.emit('ready');
         }
@@ -19694,7 +19697,7 @@ Response.prototype.handle = function (res) {
             }
         }
         catch (err) {}
-        
+
         try {
             this._emitData(res);
         }
@@ -19708,12 +19711,12 @@ Response.prototype.handle = function (res) {
             this.emit('ready');
         }
         this._emitData(res);
-        
+
         if (res.error) {
             this.emit('error', this.getResponse(res));
         }
         else this.emit('end');
-        
+
         this.emit('close');
     }
 };
@@ -22448,7 +22451,7 @@ Writable.prototype.write = function(chunk, encoding, cb) {
     chunk = new Buffer(chunk);
   if (isArrayBuffer(chunk) && typeof Uint8Array !== 'undefined')
     chunk = new Buffer(new Uint8Array(chunk));
-  
+
   if (Buffer.isBuffer(chunk))
     encoding = 'buffer';
   else if (!encoding)
@@ -23607,7 +23610,7 @@ Buffers.prototype.push = function () {
             throw new TypeError('Tried to push a non-buffer');
         }
     }
-    
+
     for (var i = 0; i < arguments.length; i++) {
         var buf = arguments[i];
         this.buffers.push(buf);
@@ -23622,7 +23625,7 @@ Buffers.prototype.unshift = function () {
             throw new TypeError('Tried to unshift a non-buffer');
         }
     }
-    
+
     for (var i = 0; i < arguments.length; i++) {
         var buf = arguments[i];
         this.buffers.unshift(buf);
@@ -23639,46 +23642,46 @@ Buffers.prototype.splice = function (i, howMany) {
     var buffers = this.buffers;
     var index = i >= 0 ? i : this.length - i;
     var reps = [].slice.call(arguments, 2);
-    
+
     if (howMany === undefined) {
         howMany = this.length - index;
     }
     else if (howMany > this.length - index) {
         howMany = this.length - index;
     }
-    
+
     for (var i = 0; i < reps.length; i++) {
         this.length += reps[i].length;
     }
-    
+
     var removed = new Buffers();
     var bytes = 0;
-    
+
     var startBytes = 0;
     for (
         var ii = 0;
         ii < buffers.length && startBytes + buffers[ii].length < index;
         ii ++
     ) { startBytes += buffers[ii].length }
-    
+
     if (index - startBytes > 0) {
         var start = index - startBytes;
-        
+
         if (start + howMany < buffers[ii].length) {
             removed.push(buffers[ii].slice(start, start + howMany));
-            
+
             var orig = buffers[ii];
             //var buf = new Buffer(orig.length - howMany);
             var buf0 = new Buffer(start);
             for (var i = 0; i < start; i++) {
                 buf0[i] = orig[i];
             }
-            
+
             var buf1 = new Buffer(orig.length - start - howMany);
             for (var i = start + howMany; i < orig.length; i++) {
                 buf1[ i - howMany - start ] = orig[i]
             }
-            
+
             if (reps.length > 0) {
                 var reps_ = reps.slice();
                 reps_.unshift(buf0);
@@ -23699,17 +23702,17 @@ Buffers.prototype.splice = function (i, howMany) {
             ii ++;
         }
     }
-    
+
     if (reps.length > 0) {
         buffers.splice.apply(buffers, [ ii, 0 ].concat(reps));
         ii += reps.length;
     }
-    
+
     while (removed.length < howMany) {
         var buf = buffers[ii];
         var len = buf.length;
         var take = Math.min(len, howMany - removed.length);
-        
+
         if (take === len) {
             removed.push(buf);
             buffers.splice(ii, 1);
@@ -23719,42 +23722,42 @@ Buffers.prototype.splice = function (i, howMany) {
             buffers[ii] = buffers[ii].slice(take);
         }
     }
-    
+
     this.length -= removed.length;
-    
+
     return removed;
 };
- 
+
 Buffers.prototype.slice = function (i, j) {
     var buffers = this.buffers;
     if (j === undefined) j = this.length;
     if (i === undefined) i = 0;
-    
+
     if (j > this.length) j = this.length;
-    
+
     var startBytes = 0;
     for (
         var si = 0;
         si < buffers.length && startBytes + buffers[si].length <= i;
         si ++
     ) { startBytes += buffers[si].length }
-    
+
     var target = new Buffer(j - i);
-    
+
     var ti = 0;
     for (var ii = si; ti < j - i && ii < buffers.length; ii++) {
         var len = buffers[ii].length;
-        
+
         var start = ti === 0 ? i - startBytes : 0;
         var end = ti + len >= j - i
             ? Math.min(start + (j - i) - ti, len)
             : len
         ;
-        
+
         buffers[ii].copy(target, ti, start, end);
         ti += end - start;
     }
-    
+
     return target;
 };
 
@@ -36469,7 +36472,7 @@ b,c),h=0;k.e(k.a(a),function(a){e.view.setUint8(h++,a)});e.limit=h;return e};ret
      * (-2^63) because -MIN_VALUE == MIN_VALUE (since 2^63 cannot be represented as
      * a positive number, it overflows back into a negative).  Not handling this
      * case would often result in infinite recursion.
-     * 
+     *
      * @exports Long
      * @class A Long class for representing a 64-bit two's-complement integer value.
      * @param {number|!{low: number, high: number, unsigned: boolean}} low The low (signed) 32 bits of the long.
@@ -36484,7 +36487,7 @@ b,c),h=0;k.e(k.a(a),function(a){e.view.setUint8(h++,a)});e.limit=h;return e};ret
             unsigned = low.unsigned;
             low = low.low;
         }
-        
+
         /**
          * The low 32 bits as a signed value.
          * @type {number}
@@ -36511,7 +36514,7 @@ b,c),h=0;k.e(k.a(a),function(a){e.view.setUint8(h++,a)});e.limit=h;return e};ret
 
     // NOTE: The following cache variables are used internally only and are therefore not exposed as properties of the
     // Long class.
-    
+
     /**
      * A cache of the Long representations of small integer values.
      * @type {!Object}
@@ -36667,7 +36670,7 @@ b,c),h=0;k.e(k.a(a),function(a){e.view.setUint8(h++,a)});e.limit=h;return e};ret
 
     // NOTE: the compiler should inline these constant values below and then remove these variables, so there should be
     // no runtime penalty for these.
-    
+
     // NOTE: The following constant values are used internally only and are therefore not exposed as properties of the
     // Long class.
 
@@ -37031,7 +37034,7 @@ b,c),h=0;k.e(k.a(a),function(a){e.view.setUint8(h++,a)});e.limit=h;return e};ret
      */
     Long.prototype.add = function(other) {
         // Divide each number into 4 chunks of 16 bits, and then sum the chunks.
-        
+
         var a48 = this.high >>> 16;
         var a32 = this.high & 0xFFFF;
         var a16 = this.low >>> 16;
@@ -37103,7 +37106,7 @@ b,c),h=0;k.e(k.a(a),function(a){e.view.setUint8(h++,a)});e.limit=h;return e};ret
 
         // Divide each long into 4 chunks of 16 bits, and then add up 4x4 products.
         // We can skip products that would overflow.
-        
+
         var a48 = this.high >>> 16;
         var a32 = this.high & 0xFFFF;
         var a16 = this.low >>> 16;
@@ -37180,7 +37183,7 @@ b,c),h=0;k.e(k.a(a),function(a){e.view.setUint8(h++,a)});e.limit=h;return e};ret
         } else if (other.isNegative()) {
             return this.div(other.negate()).negate();
         }
-        
+
         // Repeat the following until the remainder is less than other:  find a
         // floating-point that approximates remainder / other *from below*, add this
         // into the result, and subtract it from the remainder.  It is critical that
@@ -37354,7 +37357,7 @@ b,c),h=0;k.e(k.a(a),function(a){e.view.setUint8(h++,a)});e.limit=h;return e};ret
         l.unsigned = true;
         return l;
     };
-    
+
     /**
      * @return {Long} Cloned instance with the same low/high bits and unsigned flag.
      * @expose
@@ -39049,7 +39052,7 @@ v6.Address.prototype.six2four = function () {
 },{"./lib/node/bigint":175,"sprintf":176}],175:[function(require,module,exports){
 /**
  * copped from https://github.com/joyent/node/blob/master/deps/v8/benchmarks/crypto.js (under same license).
- * 
+ *
  * Copyright (c) 2003-2005  Tom Wu
  * All Rights Reserved.
  *
@@ -40386,20 +40389,20 @@ var sprintf = (function() {
 
 	// convert object to simple one line string without indentation or
 	// newlines. Note that this implementation does not print array
-	// values to their actual place for sparse arrays. 
+	// values to their actual place for sparse arrays.
 	//
 	// For example sparse array like this
 	//    l = []
 	//    l[4] = 1
 	// Would be printed as "[1]" instead of "[, , , , 1]"
-	// 
-	// If argument 'seen' is not null and array the function will check for 
+	//
+	// If argument 'seen' is not null and array the function will check for
 	// circular object references from argument.
 	str_format.object_stringify = function(obj, depth, maxdepth, seen) {
 		var str = '';
 		if (obj != null) {
 			switch( typeof(obj) ) {
-			case 'function': 
+			case 'function':
 				return '[Function' + (obj.name ? ': '+obj.name : '') + ']';
 			    break;
 			case 'object':
@@ -40423,17 +40426,17 @@ var sprintf = (function() {
 				} else { // object
 					str += '{';
 					var arr = []
-					for (var k in obj) { 
+					for (var k in obj) {
 						if(obj.hasOwnProperty(k)) {
 							if (seen && seen.indexOf(obj[k]) >= 0) arr.push(k + ': [Circular]');
-							else arr.push(k +': ' +str_format.object_stringify(obj[k], depth+1, maxdepth, seen)); 
+							else arr.push(k +': ' +str_format.object_stringify(obj[k], depth+1, maxdepth, seen));
 						}
 					}
 					str += arr.join(', ') + '}';
 				}
 				return str;
 				break;
-			case 'string':				
+			case 'string':
 				return '"' + obj + '"';
 				break
 			}
@@ -40597,7 +40600,7 @@ exports.htons = function(b, i, v) {
  * @returns {number}
  */
 exports.ntohs = function(b, i) {
-	return ((0xff & b[i]) << 8) | 
+	return ((0xff & b[i]) << 8) |
 	       ((0xff & b[i + 1]));
 };
 
