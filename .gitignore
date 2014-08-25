@@ -11,3 +11,7 @@ coverage
 .DS_Store
 docs
 browser/bitcore-dev.js
+
+# IDEA Project
+.idea/*
+*.iws
