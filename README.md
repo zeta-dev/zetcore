@@ -1,6 +1,9 @@
 Zetcore
 =======
 
+*Note:*
+This version of zetcore is in beta. Use with care, and check back for frequent updates.
+
 A pure, powerful core for your zetacoin project.
 
 Zetcore is a complete, native interface to the Zetacoin network, and provides the core functionality needed to develop apps for zetacoin. Zetcore is forked from [Bitcore](https://github.com/bitpay/bitcore), a Bitcoin library.
